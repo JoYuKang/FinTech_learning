@@ -55,6 +55,7 @@ app.get('/qrreader', function(req, res){
   res.render('qrreader');
 })
 
+
 app.get('/authResult', function(req, res){
   var authCode = req.query.code;
   console.log("인증코드 : ", authCode)
@@ -135,7 +136,7 @@ app.post('/login', function(req, res){
         }
       }
     }
-  });
+  }); 
 })
 
 app.post('/list', auth, function(req, res){
@@ -201,6 +202,8 @@ app.post('/balance',auth, function(req, res){
     }    
   })
 })
+
+
 
 app.listen(3000, function(){
     console.log('서버가 3000번 포트에서 실행중 입니다.');
