@@ -203,6 +203,88 @@ app.post('/balance',auth, function(req, res){
   })
 })
 
+app.post('/withdraw',auth, function(req, res){
+  //api에 balance 요청을 만들고 res.json() 응답 하세요;
+  var finusenum = req.body.fin_use_num;
+  var countnum = Math.floor(Math.random() * 1000000000) + 1;
+  var transId = "T991671650U" + countnum; //이용기과번호 본인것 입력
+  var userId = req.decoded.userId;
+  var amount = req.body.amount
+  var userSelectSql = "SELECT * FROM user WHERE id = ?";
+  connection.query(userSelectSql, [userId], function(err, results){
+    if(err){throw err}
+    else {
+      var userAccessToken = results[0].accesstoken;
+      var userSeqNo = results[0].userseqno;
+      var option = {
+        method : "POST",
+        url : "https://testapi.openbanking.or.kr/v2.0/transfer/withdraw/fin_num",
+        headers : {
+          Authorization : "Bearer " + userAccessToken
+        },
+        //get 요청을 보낼때 데이터는 qs, post 에 form, json 입력가능
+        json : {
+          "bank_tran_id": transId,
+          "cntr_account_type": "N",
+          "cntr_account_num": "7832932596",
+          "dps_print_content": "쇼핑몰환불",
+          "fintech_use_num": finusenum,
+          "wd_print_content": "오픈뱅킹출금",
+          "tran_amt": amount,
+          "tran_dtime": "20201120105100",
+          "req_client_name": "홍길동",
+          "req_fintech_use_num": finusenum,
+          "req_client_num": "HONGGILDONG1234",
+          "transfer_purpose": "ST",
+          "recv_client_name": "진상언",
+          "recv_client_bank_code": "097",
+          "recv_client_account_num": "7832932596"
+        }
+      }
+      request(option, function (error, response, body) {
+        console.log(body);
+        if(body.rsp_code ="A0000"){
+          var countnum2 = Math.floor(Math.random() * 1000000000) + 1;
+          var transId2 = "T991599190U" + countnum; //이용기과번호 본인것 입력
+          var option = {
+            method : "POST",
+            url : "https://testapi.openbanking.or.kr/v2.0/transfer/deposit/fin_num",
+            headers : {
+              Authorization : "Bearer " + userAccessToken
+            },
+            //get 요청을 보낼때 데이터는 qs, post 에 form, json 입력가능
+            json : {
+              "cntr_account_type": "N",
+              "cntr_account_num": "4262679045",
+              "wd_pass_phrase": "NONE",
+              "wd_print_content": "환불금액",
+              "name_check_option": "on",
+              "tran_dtime": "20201120131900",
+              "req_cnt": "1",
+              "req_list": [
+                {
+                  "tran_no": "1",
+                  "bank_tran_id": transId2,
+                  "fintech_use_num": tofinusenum,
+                  "print_content": "쇼핑몰환불",
+                  "tran_amt": amount,
+                  "req_client_name": "홍길동",
+                  "req_client_num": "HONGGILDONG1234",
+                  "req_client_fintech_use_num": finusenum,
+                  "transfer_purpose": "ST"
+                }
+              ]
+            }
+          }
+          request(option, function (error, response, body) {
+            console.log(body);
+            res.json(body);
+          });
+        }
+      });
+    }    
+  })
+})
 
 
 app.listen(3000, function(){
