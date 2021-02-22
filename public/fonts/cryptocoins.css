@@ -6,7 +6,7 @@
     url('cryptocoins.woff') format('woff'),
     url('cryptocoins.ttf') format('truetype');
 }
-
+     
 /* .cc:before { */
 .cc::before {
   font-family: "cryptocoins";
